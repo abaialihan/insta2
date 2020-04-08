@@ -20,13 +20,19 @@ public class MessageController {
         add( new HashMap<String, String>() {{ put("id", "5"); put("text", "5th Rio"); }});
     }};
 
-    @GetMapping           // @ GetMapping используется для обработки метода запроса типа GET
+    /* @ GetMapping используется для обработки метода запроса типа GET
+    * получаем весь список сообщений
+    */
+    @GetMapping
     public List<Map<String, String>> list() {
         return messages;
     }
 
+    /* Для работы с параметрами, передаваемыми через адрес запроса в Spring WebMVC используется аннотация @PathVariable.
+    * полуаем сообщения по id
+     */
     @GetMapping("{id}")
-    public Map<String, String> getOneMessage(@PathVariable String id) {   // Для работы с параметрами, передаваемыми через адрес запроса в Spring WebMVC используется аннотация @PathVariable.
+    public Map<String, String> getOneMessage(@PathVariable String id) {
         return getMessageFromId(id);
     }
 
@@ -37,13 +43,19 @@ public class MessageController {
                 .orElseThrow(NotFoundException::new);
     }
 
-    @PostMapping     // @ PostMapping используется для обработки метода запроса типа POST
+    /* @ PostMapping используется для обработки метода запроса типа POST
+    * добовление сообщений
+     */
+    @PostMapping
     public Map<String, String> create(@RequestBody Map<String, String> message){
         message.put("id", String.valueOf(counter++));
         messages.add(message);
         return message;
     }
 
+    /*
+    * обновление сообшений
+     */
     @PutMapping
     public Map<String, String> update(@PathVariable String id,
                                       @RequestBody Map<String, String> message){
