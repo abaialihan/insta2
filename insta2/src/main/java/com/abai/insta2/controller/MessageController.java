@@ -1,74 +1,63 @@
 package com.abai.insta2.controller;
 
-import com.abai.insta2.exeptions.NotFoundException;
+import com.abai.insta2.domain.Message;
+import com.abai.insta2.domain.Views;
+import com.abai.insta2.repo.MessageRepo;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController            // даем знать Spring что это rest controller
 @RequestMapping("message") // mapping после основного id
 public class MessageController {
-    private int counter = 6;
-    private List<Map<String, String>> messages = new ArrayList<Map<String, String>>() {{
-        add( new HashMap<String, String>() {{ put("id", "1"); put("text", "first Apple"); }});
-        add( new HashMap<String, String>() {{ put("id", "2"); put("text", "second Silver"); }});
-        add( new HashMap<String, String>() {{ put("id", "3"); put("text", "3rd Earth"); }});
-        add( new HashMap<String, String>() {{ put("id", "4"); put("text", "4th Subaru"); }});
-        add( new HashMap<String, String>() {{ put("id", "5"); put("text", "5th Rio"); }});
-    }};
+    private final MessageRepo messageRepo;
+
+    @Autowired
+    public MessageController(MessageRepo messageRepo) {
+        this.messageRepo = messageRepo;
+    }
 
     /* @ GetMapping используется для обработки метода запроса типа GET
     * получаем весь список сообщений
     */
     @GetMapping
-    public List<Map<String, String>> list() {
-        return messages;
+    //jsonView будем видеть только те которые мы пометили
+    @JsonView(Views.IdName.class)
+    public List<Message> list() {
+        return messageRepo.findAll();
     }
 
     /* Для работы с параметрами, передаваемыми через адрес запроса в Spring WebMVC используется аннотация @PathVariable.
     * полуаем сообщения по id
      */
     @GetMapping("{id}")
-    public Map<String, String> getOneMessage(@PathVariable String id) {
-        return getMessageFromId(id);
-    }
-
-    private Map<String, String> getMessageFromId(@PathVariable String id) {
-        return messages.stream()
-                .filter(message -> message.get("id").equals(id))
-                .findFirst()
-                .orElseThrow(NotFoundException::new);
-    }
-
-    /* @ PostMapping используется для обработки метода запроса типа POST
-    * добовление сообщений
-     */
-    @PostMapping
-    public Map<String, String> create(@RequestBody Map<String, String> message){
-        message.put("id", String.valueOf(counter++));
-        messages.add(message);
+    @JsonView(Views.FullMessage.class)
+    public Message getOneMessage(@PathVariable("id") Message message) {
         return message;
     }
 
-    /*
-    * обновление сообшений
-     */
-    @PutMapping
-    public Map<String, String> update(@PathVariable String id,
-                                      @RequestBody Map<String, String> message){
-        Map<String, String> messageFromDB = getMessageFromId(id);
-        messageFromDB.putAll(message);
-        messageFromDB.put("id", id);
-
-        return messageFromDB;
+    @PostMapping
+    public Message create(@RequestBody Message message) {
+       message.setPublicationDate(LocalDateTime.now());
+       return messageRepo.save(message);
     }
 
-    @DeleteMapping
-    public void delete(@PathVariable String id){
-        Map<String, String> message = getOneMessage(id);
-        message.remove(message);
+    @PutMapping("{id}")
+    public Message update(@PathVariable("id") Message messageFromDb,
+                          @RequestBody Message message) {
+        //copyProperties() метод из класса BeanUtils скопироует все
+        //из message в messageFromDb все поля кроме "id"
+        BeanUtils.copyProperties(message, messageFromDb, "id");
+
+        return messageRepo.save(messageFromDb);
+    }
+
+    @DeleteMapping("{id}")
+    public void delete(@PathVariable("id") Message message) {
+        messageRepo.delete(message);
     }
 }
