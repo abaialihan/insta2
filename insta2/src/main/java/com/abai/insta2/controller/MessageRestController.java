@@ -13,11 +13,11 @@ import java.util.List;
 
 @RestController            // даем знать Spring что это rest controller
 @RequestMapping("message") // mapping после основного id
-public class MessageController {
+public class MessageRestController {
     private final MessageRepo messageRepo;
 
     @Autowired
-    public MessageController(MessageRepo messageRepo) {
+    public MessageRestController(MessageRepo messageRepo) {
         this.messageRepo = messageRepo;
     }
 
