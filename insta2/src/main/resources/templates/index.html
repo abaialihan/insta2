@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Insta2.0</title>
-    <script th:inline="javascript">
-        var frontendData = [[${frontendData}]];
-    </script>
-</head>
-<body>
-<h3>Insta2.0</h3>
-<div id="app"></div>
-<script th:src="${isDevMode} ? 'http://localhost:8000/main.js' : '/js/main.js'"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Insta 2.0</title>
+        <script th:inline="javascript">
+            var frontendData = [[${frontendData}]];
+        </script>
+    </head>
+    <body>
+        <h3>Insta 2.0</h3>
+        <div id="app"></div>
+        <script th:src="${isDevMode} ? 'http://localhost:8000/main.js' : '/js/main.js'"></script>
+    </body>
 </html>
