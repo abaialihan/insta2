@@ -1,5 +1,5 @@
 <template>
-    <div style="position: relative; width: 300px;">
+    <v-layout align-space-around justify-start column>
         <message-form :messages="messages" :messageAttr="message" />
         <message-row v-for="message in messages"
                      :key="message.id"
@@ -7,7 +7,7 @@
                      :editMessage="editMessage"
                      :deleteMessage="deleteMessage"
                      :messages="messages" />
-    </div>
+    </v-layout>
 </template>
 
 <script>

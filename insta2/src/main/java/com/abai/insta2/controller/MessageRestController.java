@@ -63,7 +63,7 @@ public class MessageRestController {
         messageRepo.delete(message);
     }
 
-    @MessageMapping("/change")
+    @MessageMapping("/changeMessage")
     @SendTo("/topic/activity")
     public Message change(Message message){
         return messageRepo.save(message);
