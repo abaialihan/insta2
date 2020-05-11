@@ -27,12 +27,6 @@
         components: {
             MessagesList
         },
-        data() {
-            return {
-                messages: frontendData.messages,
-                profile: frontendData.profile,
-            }
-        },
         created() {
             addHandler(data => {
                 if (data.objectType === 'MESSAGE'){
