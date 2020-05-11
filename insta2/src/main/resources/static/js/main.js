@@ -5,11 +5,12 @@ import App from 'pages/App.vue'
 import { connect } from './util/ws'
 import 'vuetify/dist/vuetify.min.css'
 
+
 if (frontendData.profile) {
     connect()
 }
 
-Vue.use(Vuetify, { iconfont: 'mdiSvg' })
+Vue.use(Vuetify, { iconfont: 'mdi' })
 Vue.use(VueResource)
 
 new Vue({
@@ -17,3 +18,6 @@ new Vue({
     vuetify: new Vuetify(),
     render: a => a(App)
 })
+
+
+

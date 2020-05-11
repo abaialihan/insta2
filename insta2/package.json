@@ -15,7 +15,6 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
-    "@mdi/js": "^5.1.45",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.5.3",
     "vue-loader": "^15.9.1",

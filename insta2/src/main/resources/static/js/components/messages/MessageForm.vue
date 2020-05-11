@@ -6,7 +6,7 @@
                 v-model="text">
         </v-text-field>
         <v-btn @click="save" >
-            Save
+            <v-icon>mdi-publish</v-icon>
         </v-btn>
     </v-layout>
 </template>
