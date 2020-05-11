@@ -2,25 +2,29 @@ package com.abai.insta2.controller;
 
 import com.abai.insta2.domain.Message;
 import com.abai.insta2.domain.Views;
+import com.abai.insta2.dto.EventType;
+import com.abai.insta2.dto.ObjectType;
 import com.abai.insta2.repo.MessageRepo;
+import com.abai.insta2.util.WsSender;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 @RestController            // даем знать Spring что это rest controller
 @RequestMapping("message") // mapping после основного id
 public class MessageRestController {
     private final MessageRepo messageRepo;
+    private final BiConsumer<EventType, Message> wsSender;
 
     @Autowired
-    public MessageRestController(MessageRepo messageRepo) {
+    public MessageRestController(MessageRepo messageRepo, WsSender wsSender) {
         this.messageRepo = messageRepo;
+        this.wsSender = wsSender.getSender(ObjectType.MESSAGE, Views.IdName.class);
     }
 
     /* @ GetMapping используется для обработки метода запроса типа GET
@@ -45,27 +49,28 @@ public class MessageRestController {
     @PostMapping
     public Message create(@RequestBody Message message) {
        message.setPublicationDate(LocalDateTime.now());
-       return messageRepo.save(message);
+        Message updatedMessage = messageRepo.save(message);
+        wsSender.accept(EventType.CREATE, updatedMessage);
+        return updatedMessage;
     }
 
     @PutMapping("{id}")
-    public Message update(@PathVariable("id") Message messageFromDb,
-                          @RequestBody Message message) {
+    public Message update(
+            @PathVariable("id") Message messageFromDb,
+                          @RequestBody Message message
+    ) {
         //copyProperties() метод из класса BeanUtils скопироует все
         //из message в messageFromDb все поля кроме "id"
         BeanUtils.copyProperties(message, messageFromDb, "id");
 
-        return messageRepo.save(messageFromDb);
+        Message updatedMessage = messageRepo.save(messageFromDb);
+        wsSender.accept(EventType.UPDATE, updatedMessage);
+        return updatedMessage;
     }
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") Message message) {
         messageRepo.delete(message);
-    }
-
-    @MessageMapping("/changeMessage")
-    @SendTo("/topic/activity")
-    public Message change(Message message){
-        return messageRepo.save(message);
+        wsSender.accept(EventType.REMOVE, message);
     }
 }
