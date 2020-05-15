@@ -20,6 +20,7 @@
             </v-dialog>
             </v-row>
         </v-card-actions>
+        <media v-if="message.link" :message="message"></media>
         <v-card-text class="my-2">
             <i>({{ message.id }})</i>
             {{ message.text }}
@@ -32,8 +33,11 @@
 
 <script>
     import { mapActions } from 'vuex'
+    import Media from 'components/media/Media.vue'
+
     export default {
         props: ['message', 'editMessage'],
+        components: { Media },
         data () {
             return {
                 dialog: false,
